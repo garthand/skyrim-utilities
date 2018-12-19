@@ -1,18 +1,22 @@
 #!/bin/bash
-
-mapfile -t files < <(echo ./*.psc)
+mapfile -t files < <(find ./ -maxdepth 1 -iname '*_qf_*.psc')
+if [ "${files[0]}" == "" ]; then
+    echo "No source files found!"
+    exit 1
+fi
 for file in "${files[@]}"; do
-    file_no_extension=$(awk -F '.' '{print $1}' <<< "$file")
+    chmod 700 "$file"
+    file_no_extension=$(awk -F '.' '{print $2}' <<< "$file"|cut -c2-)
     newfile="newfile.psc"
-    vim -c "%s/\r$//" -c "wq" "$file"
-
+    dos2unix "$file" 2>/dev/null
+    lastfragment=$(grep -i fragment_ "$file"|awk -F '_' '{print substr($2,1,length($2)-2)}'|sort -n|tail -1)
+    nextfragment=$((lastfragment+1))
     {
     echo ";BEGIN FRAGMENT CODE - Do not edit anything between this and the end comment"
-    echo ";NEXT FRAGMENT INDEX 0"
+    echo ";NEXT FRAGMENT INDEX" "$nextfragment"
     echo "Scriptname" "$file_no_extension" "Extends Quest Hidden"
     echo
     } >> "$newfile"
-
     mapfile -t referencealiases < <(grep -i referencealias "$file")
     for referencealias in "${referencealiases[@]}"; do
         alias_short_name=$(awk -F 'Alias_' '{print $2}' <<< "$referencealias"|awk '{print $1}')
@@ -25,7 +29,7 @@ for file in "${files[@]}"; do
         } >> "$newfile"
     done
 
-    mapfile -t otherproperties < <(grep -i property sse_qf_ccffbsse001_quest_02000927.psc|grep -Evi referencealias)
+    mapfile -t otherproperties < <(grep -i property "$file"|grep -Evi referencealias)
     for property in "${otherproperties[@]}"; do
         echo "$property" >> "$newfile"
     done
@@ -33,10 +37,12 @@ for file in "${files[@]}"; do
 
     mapfile -t fragments < <(grep -i fragment_ "$file")
     for fragment in "${fragments[@]}"; do
-        mysearch=${fragment::-2}
+        basename=${fragment::-2}
+        fragmentname=$(awk '{print $2}' <<< "$basename")
+        mysearch="$basename\(\)"
         export mysearch
         {
-        echo ";BEGIN FRAGMENT" "$mysearch"
+        echo ";BEGIN FRAGMENT" "$fragmentname"
         perl -ne 'print if /^$ENV{mysearch}/ .. /^endFunction/' "$file"|sed '2 s/^.*$/;BEGIN CODE/'|sed '$i;END CODE'
         echo ";END FRAGMENT"
         echo
@@ -47,5 +53,5 @@ for file in "${files[@]}"; do
     echo ";END FRAGMENT CODE - Do not edit anything between this and the begin comment" >> "$newfile"
     rm -f "$file"
     mv "$newfile" "$file"
-    vim -c "%s/\r$//" -c "wq" "$file"
+    echo "Successfully converted" "$file"
 done
