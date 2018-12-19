@@ -53,5 +53,6 @@ for file in "${files[@]}"; do
     echo ";END FRAGMENT CODE - Do not edit anything between this and the begin comment" >> "$newfile"
     rm -f "$file"
     mv "$newfile" "$file"
+    unix2dos "$file" 2>/dev/null
     echo "Successfully converted" "$file"
 done
