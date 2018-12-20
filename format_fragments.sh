@@ -1,5 +1,5 @@
 #!/bin/bash
-mapfile -t files < <(find ./ -maxdepth 1 -iname '*_qf_*.psc')
+mapfile -t files < <(find ./ -maxdepth 1 -iname "*_qf_*.psc" -o -iname "*_tif_*.psc" -o -iname "tif_*.psc")
 if [ "${files[0]}" == "" ]; then
     echo "No source files found!"
     exit 1
@@ -9,7 +9,7 @@ for file in "${files[@]}"; do
     file_no_extension=$(awk -F '.' '{print $2}' <<< "$file"|cut -c2-)
     newfile="newfile.psc"
     dos2unix "$file" 2>/dev/null
-    lastfragment=$(grep -i fragment_ "$file"|awk -F '_' '{print substr($2,1,length($2)-2)}'|sort -n|tail -1)
+    lastfragment=$(grep -i fragment_ "$file"|awk -F '_' '{print $2}'|awk -F '(' '{print $1}'|sort -n|tail -1)
     nextfragment=$((lastfragment+1))
     {
     echo ";BEGIN FRAGMENT CODE - Do not edit anything between this and the end comment"
@@ -37,9 +37,9 @@ for file in "${files[@]}"; do
 
     mapfile -t fragments < <(grep -i fragment_ "$file")
     for fragment in "${fragments[@]}"; do
-        basename=${fragment::-2}
+        basename=$(awk -F '(' '{print $1}' <<< "$fragment")
         fragmentname=$(awk '{print $2}' <<< "$basename")
-        mysearch="$basename\(\)"
+        mysearch="$basename\("
         export mysearch
         {
         echo ";BEGIN FRAGMENT" "$fragmentname"
