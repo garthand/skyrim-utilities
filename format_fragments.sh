@@ -1,5 +1,5 @@
 #!/bin/bash
-mapfile -t files < <(find ./ -maxdepth 1 -iname "*_qf_*.psc" -o -iname "*_tif_*.psc" -o -iname "tif_*.psc")
+mapfile -t files < <(find ./ -maxdepth 1 -iname "*[q|p|ti]f_*.psc")
 if [ "${files[0]}" == "" ]; then
     echo "No source files found!"
     exit 1
