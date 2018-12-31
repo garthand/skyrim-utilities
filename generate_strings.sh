@@ -1,5 +1,6 @@
 #!/bin/bash
 
+shopt -s nocaseglob
 strings=$(echo ./*.strings)
 dlstrings=$(echo ./*.dlstrings)
 ilstrings=$(echo ./*.ilstrings)
@@ -11,3 +12,4 @@ for language in "${languages[@]}"; do
     cp "$dlstrings" "$basename""_""$language"".dlstrings"
     cp "$ilstrings" "$basename""_""$language"".ilstrings"
 done
+shopt -u nocaseglob
