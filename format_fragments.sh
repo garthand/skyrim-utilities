@@ -29,12 +29,6 @@ for file in "${files[@]}"; do
         } >> "$newfile"
     done
 
-    mapfile -t otherproperties < <(grep -i property "$file"|grep -Evi referencealias)
-    for property in "${otherproperties[@]}"; do
-        echo "$property" >> "$newfile"
-    done
-    echo >> "$newfile"
-
     mapfile -t fragments < <(grep -i fragment_ "$file")
     for fragment in "${fragments[@]}"; do
         basename=$(awk -F '(' '{print $1}' <<< "$fragment")
@@ -51,6 +45,11 @@ for file in "${files[@]}"; do
     done
 
     echo ";END FRAGMENT CODE - Do not edit anything between this and the begin comment" >> "$newfile"
+    echo >> "$newfile"
+    mapfile -t otherproperties < <(grep -i property "$file"|grep -Evi referencealias)
+    for property in "${otherproperties[@]}"; do
+        echo "$property" >> "$newfile"
+    done
     rm -f "$file"
     mv "$newfile" "$file"
     unix2dos "$file" 2>/dev/null
