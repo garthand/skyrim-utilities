@@ -45,9 +45,9 @@ for file in "${files[@]}"; do
     done
 
     echo ";END FRAGMENT CODE - Do not edit anything between this and the begin comment" >> "$newfile"
-    echo >> "$newfile"
     mapfile -t otherproperties < <(grep -i property "$file"|grep -Evi referencealias)
     for property in "${otherproperties[@]}"; do
+        echo >> "$newfile"
         echo "$property" >> "$newfile"
     done
     rm -f "$file"
