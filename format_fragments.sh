@@ -51,7 +51,8 @@ for file in "${files[@]}"; do
         echo "$property" >> "$newfile"
     done
     rm -f "$file"
-    mv "$newfile" "$file"
+    sed 's/	*//g' "$newfile" > "$file"
+    rm -f "$newfile"
     unix2dos "$file" 2>/dev/null
     echo "Successfully converted" "$file"
 done
