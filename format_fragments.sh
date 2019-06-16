@@ -45,13 +45,27 @@ for file in "${files[@]}"; do
     done
 
     echo ";END FRAGMENT CODE - Do not edit anything between this and the begin comment" >> "$newfile"
+
     mapfile -t otherproperties < <(grep -i property "$file"|grep -Evi referencealias)
     for property in "${otherproperties[@]}"; do
         echo >> "$newfile"
         echo "$property" >> "$newfile"
     done
+
+    mapfile -t functions < <(grep -i function "$file"|grep -Evi "fragment|endfunction|functions")
+    for function in "${functions[@]}"; do
+        basename=$(awk -F '(' '{print $1}' <<< "$function")
+        mysearch="$basename\("
+        export mysearch
+        {
+        echo
+        perl -ne 'print if /^$ENV{mysearch}/ .. /^endFunction/' "$file"|sed '2d'
+        } >> "$newfile"
+        unset mysearch
+    done
+
     rm -f "$file"
-    sed 's/	*//g' "$newfile" > "$file"
+    sed 's/     *//g' "$newfile" > "$file"
     rm -f "$newfile"
     unix2dos "$file" 2>/dev/null
     echo "Successfully converted" "$file"
