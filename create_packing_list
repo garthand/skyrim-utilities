@@ -1,0 +1,24 @@
+#!/bin/bash
+modlist=./mymodlist.achlist
+if [ "$1" == "-XBO" ]
+then
+    find ./scripts -type f|grep -Evi "SKSE|SSEEdit|*.txt|*.psc|*.html|*.bsa|*.esp|*.esm|*.esl|*.zip|*.xml|*.achlist|*.ini|*.modgroups|BGS_Logo.bik" > "$modlist"
+else
+    find ./scripts -type f|grep -Evi "SKSE|SSEEdit|*.txt|*.html|*.bsa|*.esp|*.esm|*.esl|*.zip|*.xml|*.achlist|*.ini|*.modgroups|BGS_Logo.bik" > "$modlist"
+fi
+find ./meshes -type f|grep -Evi "SKSE|SSEEdit|*.txt|*.html|*.bsa|*.esp|*.esm|*.esl|*.zip|*.xml|*.achlist|*.ini|*.modgroups|BGS_Logo.bik" >> "$modlist"
+find ./strings -type f|grep -Evi "SKSE|SSEEdit|*.txt|*.html|*.bsa|*.esp|*.esm|*.esl|*.zip|*.xml|*.achlist|*.ini|*.modgroups|BGS_Logo.bik" >> "$modlist"
+# Replace single forward slashes with double back slashes
+sed -i "s/\\//\\\\\\\\/g" "$modlist"
+# Append replace local directory with Data header
+sed -i "s/\\./Data/" "$modlist"
+# Quote beginning of each line
+sed -i "s/^Data/\"Data/g" "$modlist"
+# Quote the ending of each line and add a comma
+sed -i "s/$/\",/g" "$modlist"
+# Delete the comma from the last line
+sed -i "$ s/.$//" "$modlist"
+# Add an open bracket to the top of the file
+sed -i "1i\\[" "$modlist"
+# Add a closing bracket to the end of the file
+echo "]" >> "$modlist"
