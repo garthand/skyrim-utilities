@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e
+rm -rf DialogueViews
+unzip Scripts.zip
+rm -rf DialogueViews
+mv Source Scripts
+mv ./Scripts/Scripts ./Scripts/Source
+mapfile -t bsas < <(ls ./cc*.bsa)
+for bsa in "${bsas[@]}"
+do
+    bsab.exe -e -f *.pex -o "$bsa" ./
+done
+cd ./Scripts
+Champollion.exe ./*.pex
+rm -f ./*.pex
+mkdir temp
+mv ./*.psc ./temp
+cd temp
+skyrim_format_fragments
+mv ./*.psc ../Source/
+cd ..
+rmdir temp
+cd ..
+bsab.exe -e -f *.psc -o Unofficial\ Skyrim\ Special\ Edition\ Patch.bsa ./
+bsab.exe -e -f *.psc -o Unofficial\ Skyrim\ Creation\ Club\ Content\ Patch.bsa ./
