@@ -11,6 +11,7 @@ do
     bsab.exe -e -f *.pex -o "$bsa" ./
 done
 cd ./Scripts
+# De-compile scripts
 Champollion.exe ./*.pex
 rm -f ./*.pex
 mkdir temp
