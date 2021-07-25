@@ -1,26 +1,42 @@
 #!/bin/bash
 set -e
-rm -rf DialogueViews
-unzip Scripts.zip
-rm -rf DialogueViews
+
+# Extract vanilla scripts
+echo "Extracting vanilla scripts..."
+unzip Scripts.zip -x "*.xml" >/dev/null
+# Correct directory structure from /Source/Scripts to /Scripts/Source
+echo "Correcting script directory structure..."
 mv Source Scripts
 mv ./Scripts/Scripts ./Scripts/Source
+# Extract scripts from each CC BSA archive
+echo "Extracting scripts from CC BSAs..."
 mapfile -t bsas < <(ls ./cc*.bsa)
 for bsa in "${bsas[@]}"
 do
-    bsab.exe -e -f *.pex -o "$bsa" ./
+    bsab.exe -e -f "*.pex" -o "$bsa" ./ >/dev/null
 done
+# De-compile all extracted scripts
+echo "De-compiling scripts..."
 cd ./Scripts
-# De-compile scripts
-Champollion.exe ./*.pex
+mapfile -t files < <(ls ./*.pex)
+for file in "${files[@]}"
+do
+	Champollion.exe "$file" >/dev/null
+done
 rm -f ./*.pex
+# Format quest fragment scripts so the CK can read them
+echo "Re-formatting quest scripts for the CK..."
 mkdir temp
 mv ./*.psc ./temp
 cd temp
-skyrim_format_fragments
+skyrim_format_fragments >/dev/null
+# Move source scripts to /Scripts/Source and clean up other directories
+echo "Cleaning up..."
 mv ./*.psc ../Source/
 cd ..
 rmdir temp
 cd ..
-bsab.exe -e -f *.psc -o Unofficial\ Skyrim\ Special\ Edition\ Patch.bsa ./
-bsab.exe -e -f *.psc -o Unofficial\ Skyrim\ Creation\ Club\ Content\ Patch.bsa ./
+# Extract USSEP and UCCCP scripts on top of vanilla scripts
+echo "Extracting unofficial patch source scripts..."
+bsab.exe -e -f "*.psc" -o Unofficial\ Skyrim\ Special\ Edition\ Patch.bsa ./ >/dev/null
+bsab.exe -e -f "*.psc" -o Unofficial\ Skyrim\ Creation\ Club\ Content\ Patch.bsa ./ >/dev/null
