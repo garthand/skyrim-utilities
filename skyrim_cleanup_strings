@@ -1,0 +1,10 @@
+#!/bin/bash
+
+mapfile -t files < <(find ./ -type f -name "*.save*")
+for file in "${files[@]}"
+do 
+    tempfile=$(cut -c 3- <<< "$file")
+    oldfile=$(awk -F '.save' '{print $1}' <<< "$tempfile")
+    rm -f "$oldfile"
+    mv "$tempfile" "$oldfile"
+done
