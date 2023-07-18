@@ -5,7 +5,7 @@ strings=$(echo ./*.strings)
 dlstrings=$(echo ./*.dlstrings)
 ilstrings=$(echo ./*.ilstrings)
 chmod 700 "$strings" "$dlstrings" "$ilstrings"
-languages=(French Spanish German Russian Polish Italian)
+languages=(French Spanish German Russian Polish Italian Japanese Chinese)
 basename=$(awk -F '_' '{print $1}' <<< "$strings")
 for language in "${languages[@]}"; do
     cp "$strings" "$basename""_""$language"".strings"
