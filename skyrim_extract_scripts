@@ -36,5 +36,5 @@ rmdir temp
 cd ../..
 # Extract USSEP and UCCCP scripts on top of vanilla scripts
 echo "Extracting unofficial patch source scripts..."
-bsab.exe -e -f "*.psc" -o Unofficial\ Skyrim\ Special\ Edition\ Patch.bsa ./ >/dev/null
-bsab.exe -e -f "*.psc" -o Unofficial\ Skyrim\ Creation\ Club\ Content\ Patch.bsa ./ >/dev/null
+bsab.exe -e -f "*.psc" -o unofficial\ skyrim\ special\ edition\ patch.bsa ./ >/dev/null
+bsab.exe -e -f "*.psc" -o unofficial\ skyrim\ creation\ club\ content\ patch.bsa ./ >/dev/null
